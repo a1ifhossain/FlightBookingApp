@@ -23,32 +23,29 @@ npm ci
 npm run dev
 ```
 
-Open **http://127.0.0.1:5173**. The API creates/applies migrations for the `FlightBooking` database. Nothing depends on Docker for this setup. Use fictional details and the demo password in your ignored local `.env` file. For a named instance, run `./scripts/dev-api.ps1 -SqlServer 'localhost\INSTANCE'`.
-
-SQL checks default to the installed server. Use `./scripts/sql-check.ps1 -DockerSql` and `./scripts/integration-test.ps1 -BaseUrl http://localhost:8088` for the Docker stack.
+Open **http://127.0.0.1:5173**. The API creates/applies migrations for the `FlightBooking` database. Use fictional details and the demo password in your ignored local `.env` file. For a named instance, run `./scripts/dev-api.ps1 -SqlServer 'localhost\INSTANCE'`.
 
 
-## Optional: Docker Desktop
 
-Prerequisites: Docker Desktop running with **Linux containers**, Git, and PowerShell 7. Give Docker enough memory for SQL Server (at least 4 GB total recommended for the stack). Initial image downloads can take several minutes.
+## Demo login credentials
 
-From the project root:
+The API creates three demo accounts on initial startup:
 
-```powershell
-./scripts/start.ps1
-docker compose ps
-```
-
-Open **http://localhost:8088**. Readiness: http://localhost:5080/health/ready.
-
-`setup.ps1` creates an ignored `.env` with random local SQL and demo passwords. It preserves an existing file. Find `DEMO_PASSWORD` in your local `.env` and sign in with:
-
-| Account | Role | Access |
+| Email | Role | Access |
 |---|---|---|
 | customer@example.com | Customer | Own bookings |
 | agent@example.com | Agent | Own bookings for passengers; agent workspace |
 | admin@example.com | Admin | All bookings, user/agent roles, reports |
 
+**Password for all three accounts:** the value of `DEMO_PASSWORD` in your local `.env` file at the project root.
+
+Run `./scripts/setup.ps1` before starting the API. It generates a password for your installation and preserves an existing `.env`. To display your demo password in PowerShell:
+
+```powershell
+Get-Content .env | Select-String '^DEMO_PASSWORD='
+```
+
+Copy the value after `DEMO_PASSWORD=` into the website's password field. Each installation generates its own password; there is no shared password in the repository. Keep `.env` out of Git.
 You can register your own customer account. Passwords need 10+ characters, uppercase, lowercase, digit and symbol. Sessions are kept only in frontend memory: reloading the page signs you out. No real email delivery is configured.
 
 ## Try the full journey
@@ -68,7 +65,7 @@ Dates on the **13th** simulate a REST failure. Dates on the **14th** simulate a 
 
 ```mermaid
 flowchart LR
-    Browser[React browser UI] --> Web[Nginx or Vite proxy]
+    Browser[React browser UI] --> Web[Vite proxy]
     Web --> API[ASP.NET Core controllers]
     API --> Business[BookingManager / rules]
     Business --> EF[EF Core / Identity]
@@ -102,28 +99,7 @@ dotnet test tests/FlightBooking.Tests
 npm run build --prefix src/flight-booking-web
 ```
 
-The integration checks run against real SQL Server through the application and create fictional test bookings. They cover authentication, ownership, roles, both supplier protocols, server-controlled prices, idempotency, stale updates, lifecycle rules, ticket/passenger relationships and reporting. Unit tests do not require Docker.
-
-## Develop outside containers
-
-Install .NET 10 SDK and Node.js 24. Run only SQL in Docker, then use three terminals:
-
-```powershell
-docker compose up -d sql
-./scripts/dev-api.ps1 -DockerSql
-```
-
-```powershell
-dotnet run --project src/FlightBooking.MockSupplier --urls http://127.0.0.1:5090
-```
-
-```powershell
-cd src/flight-booking-web
-npm ci
-npm run dev
-```
-
-Open http://127.0.0.1:5173. Stop the container API/supplier first if they already occupy ports 5080/5090 (`docker compose stop api supplier web`). Vite forwards `/api` to the API. Docker uses Nginx for that routing instead; no permissive CORS policy is needed.
+The integration checks run against real SQL Server through the application and create fictional test bookings. They cover authentication, ownership, roles, both supplier protocols, server-controlled prices, idempotency, stale updates, lifecycle rules, ticket/passenger relationships and reporting.
 
 ## EF Core migrations
 
@@ -144,12 +120,12 @@ git commit -m "Build full-stack mock flight booking application"
 git switch -c feature/next-improvement
 ```
 
-`.env`, dependencies, build output and test artifacts are ignored. CI builds/tests the code and runs Docker integration checks on pushes and PRs.
+`.env`, dependencies, build output and test artifacts are ignored. CI builds and tests the code on pushes and pull requests.
 
 
 ## Practical limits
 
-This application uses simulated airline inventory and payment workflows. Inventory is static and does not decrement; supplier operations return deterministic fictional references. Payments/refunds are simulated. It does not implement live fares, GDS/NDC certification, real payment processing, seat holds, multi-city itineraries or an outbox/saga for cross-system recovery. EF commits related local writes atomically, but an external supplier call and database commit cannot share a transaction. Real suppliers need durable operation tracking and reconciliation. Docker uses SQL Developer edition, local-only ports, a development database admin account and local HTTP. Public deployment requires HTTPS, restricted database credentials, managed secrets and operational hardening.
+This application uses simulated airline inventory and payment workflows. Inventory is static and does not decrement; supplier operations return deterministic fictional references. Payments/refunds are simulated. It does not implement live fares, GDS/NDC certification, real payment processing, seat holds, multi-city itineraries or an outbox/saga for cross-system recovery. EF commits related local writes atomically, but an external supplier call and database commit cannot share a transaction. Real suppliers need durable operation tracking and reconciliation. Public deployment requires HTTPS, restricted database credentials, managed secrets and operational hardening.
 
 See [docs/learning-guide.md](docs/learning-guide.md) for an explanation of the application components and workflows.
 
