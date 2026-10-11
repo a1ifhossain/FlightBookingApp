@@ -1,0 +1,13 @@
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/.dotnet-home
+.git
+.env
+test-results
+
+.local
+.vs
+**/.env.local
+**/.env.production

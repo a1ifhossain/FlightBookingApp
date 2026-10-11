@@ -1,0 +1,31 @@
+name: Validate
+on: [push, pull_request]
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: {dotnet-version: '10.0.x'}
+      - run: dotnet test tests/FlightBooking.Tests --configuration Release
+      - run: dotnet build src/FlightBooking.MockSupplier --configuration Release
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm, cache-dependency-path: src/flight-booking-web/package-lock.json}
+      - run: npm ci
+        working-directory: src/flight-booking-web
+      - run: npm run build
+        working-directory: src/flight-booking-web
+      - name: Full integration checks
+        shell: pwsh
+        run: |
+          ./scripts/setup.ps1
+          docker compose up -d --build
+          for ($i = 0; $i -lt 60; $i++) {
+            try { Invoke-RestMethod http://localhost:8088/health/ready -TimeoutSec 2 | Out-Null; break } catch { Start-Sleep -Seconds 2 }
+          }
+          ./scripts/integration-test.ps1 -BaseUrl http://localhost:8088
+          ./scripts/final-checks.ps1 -BaseUrl http://localhost:8088
+          ./scripts/sql-check.ps1 -DockerSql
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --tail=80

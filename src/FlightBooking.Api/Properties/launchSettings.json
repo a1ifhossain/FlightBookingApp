@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "InstalledSql": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "applicationUrl": "http://127.0.0.1:5080",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings__SqlServer": "Server=localhost;Database=FlightBooking;Integrated Security=True;TrustServerCertificate=True",
+        "Database__Initialize": "true",
+        "Supplier__Url": "http://127.0.0.1:5090"
+      }
+    }
+  }
+}
