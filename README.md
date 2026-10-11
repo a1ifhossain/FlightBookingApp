@@ -154,9 +154,8 @@ This application uses simulated airline inventory and payment workflows. Invento
 See [docs/learning-guide.md](docs/learning-guide.md) for an explanation of the application components and workflows.
 
 
-## Verification and preview
+## Preview
 
-See [the verification record](docs/verification.md). Native MSSQL is the verified local setup. Run scripts/final-checks.ps1 for session revocation and true concurrent-request checks. Historical scripts from lessons 1–3 are archived in docs/legacy-scripts.
 
 ![Flight search preview](docs/screenshots/modern-homepage.png)
 
