@@ -27,7 +27,6 @@ Open **http://127.0.0.1:5173**. The API creates/applies migrations for the `Flig
 
 SQL checks default to the installed server. Use `./scripts/sql-check.ps1 -DockerSql` and `./scripts/integration-test.ps1 -BaseUrl http://localhost:8088` for the Docker stack.
 
-For GitHub and optional Vercel/Render deployment, see [docs/hosting.md](docs/hosting.md).
 
 ## Optional: Docker Desktop
 
