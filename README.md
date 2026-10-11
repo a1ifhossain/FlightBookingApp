@@ -110,19 +110,6 @@ dotnet ef migrations add DescribeYourChange --project src/FlightBooking.Api
 
 Review the generated migration. Local startup applies migrations when `Database__Initialize=true`. The initial schema has users, roles, bookings, passengers, tickets and event history, decimal currency precision, foreign keys, unique idempotency keys, rowversion concurrency and query indexes. A second migration installs the reporting stored procedure. For a shared deployment, apply reviewed migrations separately instead of having multiple API instances apply them.
 
-## Contributing
-
-```powershell
-git status
-git diff
-git add .
-git commit -m "Build full-stack mock flight booking application"
-git switch -c feature/next-improvement
-```
-
-`.env`, dependencies, build output and test artifacts are ignored. CI builds and tests the code on pushes and pull requests.
-
-
 ## Practical limits
 
 This application uses simulated airline inventory and payment workflows. Inventory is static and does not decrement; supplier operations return deterministic fictional references. Payments/refunds are simulated. It does not implement live fares, GDS/NDC certification, real payment processing, seat holds, multi-city itineraries or an outbox/saga for cross-system recovery. EF commits related local writes atomically, but an external supplier call and database commit cannot share a transaction. Real suppliers need durable operation tracking and reconciliation. Public deployment requires HTTPS, restricted database credentials, managed secrets and operational hardening.
