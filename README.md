@@ -1,8 +1,8 @@
 # Flight Booking App
 
-A full-stack educational OTA application tailored to the Triplover/Firsttrip junior software engineer job description. C# / ASP.NET Core 10, React with JavaScript, Microsoft SQL Server, EF Core, and local REST/SOAP mock airlines. This project is independent of those companies.
+A full-stack flight booking application built with C# / ASP.NET Core 10, React with JavaScript, Microsoft SQL Server and Entity Framework Core. It supports flight search, passenger management, bookings, mock ticketing, cancellations and refunds, with customer, agent and admin roles. Local REST and SOAP supplier services simulate airline integrations.
 
-## Start with your installed MSSQL (recommended on this computer)
+## Run locally with SQL Server
 
 SQL Server's default instance is `localhost`. Use Windows authentication; the database uses your SQL Server's configured data location. Install .NET 10 SDK, Node.js 24, Git and PowerShell 7.
 
@@ -27,13 +27,13 @@ Open **http://127.0.0.1:5173**. The API creates/applies migrations for the `Flig
 
 SQL checks default to the installed server. Use `./scripts/sql-check.ps1 -DockerSql` and `./scripts/integration-test.ps1 -BaseUrl http://localhost:8088` for the Docker stack.
 
-For GitHub and optional Vercel/Render deployment, see [docs/hosting.md](docs/hosting.md). No repository or cloud service has been published.
+For GitHub and optional Vercel/Render deployment, see [docs/hosting.md](docs/hosting.md).
 
 ## Optional: Docker Desktop
 
 Prerequisites: Docker Desktop running with **Linux containers**, Git, and PowerShell 7. Give Docker enough memory for SQL Server (at least 4 GB total recommended for the stack). Initial image downloads can take several minutes.
 
-From `D:\dotnetPrac\DOTNETPROJECTS\FlightBookingApp`:
+From the project root:
 
 ```powershell
 ./scripts/start.ps1
@@ -78,7 +78,7 @@ flowchart LR
     Adapter --> Mock[Local mock supplier service]
 ```
 
-The main backend is a **modular monolith**. The separate supplier simulator teaches distributed HTTP integration; this is not a collection of independent business microservices.
+The main backend is a **modular monolith**. A separate mock supplier service exposes REST and SOAP endpoints, which the backend consumes through HTTP adapters.
 
 The compiled backend is in `src/FlightBooking.Api/Complete/`. Earlier milestone code is archived in docs/legacy-code as reference material and is outside the compiled applications. Lessons 1–3 describe those earlier stages; the current API contracts are documented in [docs/api.md](docs/api.md).
 
@@ -135,7 +135,7 @@ dotnet ef migrations add DescribeYourChange --project src/FlightBooking.Api
 
 Review the generated migration. Local startup applies migrations when `Database__Initialize=true`. The initial schema has users, roles, bookings, passengers, tickets and event history, decimal currency precision, foreign keys, unique idempotency keys, rowversion concurrency and query indexes. A second migration installs the reporting stored procedure. For a shared deployment, apply reviewed migrations separately instead of having multiple API instances apply them.
 
-## Git and portfolio
+## Contributing
 
 ```powershell
 git status
@@ -145,19 +145,20 @@ git commit -m "Build full-stack mock flight booking application"
 git switch -c feature/next-improvement
 ```
 
-No remote repository has been created or published. `.env`, dependencies, build output and test artifacts are ignored. CI builds/tests the code and runs Docker integration checks on pushes and PRs.
+`.env`, dependencies, build output and test artifacts are ignored. CI builds/tests the code and runs Docker integration checks on pushes and PRs.
 
-Suggested resume bullet after reviewing the code and reproducing the tests: “Built a React and ASP.NET Core flight-booking application with SQL Server/EF Core, role-based authorization, mock REST/SOAP integrations, idempotent booking creation, concurrency checks, automated tests and Docker Compose.”
 
 ## Practical limits
 
-This is a local portfolio system. Inventory is static and does not decrement; supplier operations return deterministic fictional references. Payments/refunds are simulated. It does not implement live fares, GDS/NDC certification, real payment processing, seat holds, multi-city itineraries or an outbox/saga for cross-system recovery. EF commits related local writes atomically, but an external supplier call and database commit cannot share a transaction. Real suppliers need durable operation tracking and reconciliation. Docker uses SQL Developer edition, local-only ports, a development database admin account and local HTTP. Public deployment requires HTTPS, restricted database credentials, managed secrets and operational hardening.
+This application uses simulated airline inventory and payment workflows. Inventory is static and does not decrement; supplier operations return deterministic fictional references. Payments/refunds are simulated. It does not implement live fares, GDS/NDC certification, real payment processing, seat holds, multi-city itineraries or an outbox/saga for cross-system recovery. EF commits related local writes atomically, but an external supplier call and database commit cannot share a transaction. Real suppliers need durable operation tracking and reconciliation. Docker uses SQL Developer edition, local-only ports, a development database admin account and local HTTP. Public deployment requires HTTPS, restricted database credentials, managed secrets and operational hardening.
 
-See [docs/learning-guide.md](docs/learning-guide.md) to understand each component and prepare for interview discussion.
+See [docs/learning-guide.md](docs/learning-guide.md) for an explanation of the application components and workflows.
 
 
 ## Verification and preview
 
 See [the verification record](docs/verification.md). Native MSSQL is the verified local setup. Run scripts/final-checks.ps1 for session revocation and true concurrent-request checks. Historical scripts from lessons 1–3 are archived in docs/legacy-scripts.
+
+![Flight search preview](docs/screenshots/modern-homepage.png)
 
 ![Booking and mock ticket preview](docs/screenshots/booking.png)
