@@ -133,6 +133,6 @@ See [docs/learning-guide.md](docs/learning-guide.md) for an explanation of the a
 ## Preview
 
 
-![Flight search preview](docs/screenshots/modern-homepage.png)
+![Flight search preview](docs/screenshots/latest-homepage.png)
 
-![Booking and mock ticket preview](docs/screenshots/booking.png)
+![Sign-in preview](docs/screenshots/latest-signin.png)
